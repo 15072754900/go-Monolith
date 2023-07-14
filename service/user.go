@@ -38,7 +38,7 @@ func (*User) Login(c *gin.Context, username, password string) (loginVo resp.Logi
 	// UUID 生成方法：IP + 浏览信息 + 操作系统信息
 	uuid := utils.Encryptor.MD5(userDetailDTO.IpAddress + userDetailDTO.Browser + userDetailDTO.OS)
 	token, err := utils.GetJWT().GetToken(userAuth.ID, userDetailDTO.RoleLabels[0], uuid)
-	fmt.Println("登陆成功", uuid)
+	fmt.Println("登陆成功,开始鉴权", uuid)
 	if err != nil {
 		utils.Logger.Info("登录时生成 Token 错误: ", zap.Error(err))
 		return loginVo, r.ERROR_TOKEN_CREATE
