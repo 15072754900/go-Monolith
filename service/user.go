@@ -22,6 +22,7 @@ type User struct{}
 func (*User) Login(c *gin.Context, username, password string) (loginVo resp.LoginVO, code int) {
 	// 检查用户是否存在
 	userAuth := dao.GetOne(model.UserAuth{}, "username", username)
+	fmt.Println("this is userAuth", userAuth)
 	if userAuth.ID == 0 {
 		return loginVo, r.ERROR_USER_NOT_EXIST
 	}
