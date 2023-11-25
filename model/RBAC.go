@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"reflect"
+	"time"
+)
 
 // 权限控制 - 7 张表
 
@@ -10,7 +13,11 @@ import "time"
 
 // 角色-资源 关联
 
-// 用户-角色 关联
+// UserRole 用户-角色 关联
+type UserRole struct {
+	UserId int `json:"User_id"`
+	RoleId int `json:"role_id"`
+}
 
 // Menu 菜单
 type Menu struct {
@@ -38,4 +45,8 @@ type UserAuth struct {
 	IpAddress     string                  `gorm:"type:varchar(20);comment:登录IP地址" json:"ip_address"`
 	IpSource      string                  `gorm:"type:varchar(50);comment:IP来源" json:"ip_source"`
 	LastLoginTime time.Time               `gorm:"comment:上次登录时间" json:"last_login_time"`
+}
+
+func (u *UserAuth) IsEmpty() bool {
+	return reflect.DeepEqual(u, &UserAuth{})
 }

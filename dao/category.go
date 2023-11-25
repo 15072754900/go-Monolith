@@ -8,7 +8,7 @@ import (
 type Category struct{}
 
 func (*Category) GetList(req req.PageQuery) ([]resp.CategoryVo, int64) {
-	var datas = make([]resp.CategoryVo, 0)
+	var dates = make([]resp.CategoryVo, 0)
 	var total int64
 
 	db := DB.Table("category c").
@@ -23,6 +23,6 @@ func (*Category) GetList(req req.PageQuery) ([]resp.CategoryVo, int64) {
 		Order("c.id DESC").
 		Count(&total).
 		Limit(req.PageSize).Offset(req.PageSize * (req.PageNum - 1)).
-		Find(&datas)
-	return datas, total
+		Find(&dates)
+	return dates, total
 }

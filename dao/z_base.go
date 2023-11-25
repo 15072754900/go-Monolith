@@ -63,3 +63,19 @@ func Count[T any](data T, query string, args ...any) int64 { // 在类型前面�
 	}
 	return total
 }
+
+// Delete 批量删除数据，通过条件控制可以删除单条数据
+func Delete[T any](data T, query string, args ...any) {
+	err := DB.Where(query, args...).Delete(&data).Error
+	if err != nil {
+		panic(err)
+	}
+}
+
+// UpdatesMap 批量更新：map的字段就是要更新的字段（map可以更新零值），通过条件可以实现单行更新
+func UpdatesMap[T any](data *T, maps map[string]any, query string, args ...any) {
+	err := DB.Model(&data).Where(query, args...).Updates(maps).Error
+	if err != nil {
+		panic(err)
+	}
+}

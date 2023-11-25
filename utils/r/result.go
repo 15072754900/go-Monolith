@@ -42,3 +42,7 @@ func SendData(c *gin.Context, code int, data any) {
 func SuccessData(c *gin.Context, data any) {
 	Send(c, http.StatusOK, OK, data)
 }
+
+func Success(c *gin.Context) {
+	Send(c, http.StatusOK, OK, nil)
+}

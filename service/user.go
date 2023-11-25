@@ -13,9 +13,13 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
+
+// 这里就是直接和数据库对接的地方、
 
 type User struct{}
 
@@ -133,4 +137,101 @@ func (*User) GetList(req req.GetUsers) resp.PageResult[[]resp.UserVO] { // 泛�
 		Total:    count,
 		List:     list,
 	}
+}
+
+func (*User) Update(req req.UpdateUser) int {
+	userInfo := model.UserInfo{
+		Universal: model.Universal{ID: req.UserInfoId},
+		Nickname:  req.Nickname,
+	}
+	dao.Update(&userInfo)
+	// 清空user_role关系并更新user_role列表
+	dao.Delete(model.UserRole{}, "user_id = ?", req.UserInfoId)
+	// 先删除旧的，再添加新的
+	var userRoles []model.UserRole
+	for _, id := range req.RoleIds {
+		userRoles = append(userRoles, model.UserRole{
+			RoleId: id,
+			UserId: req.UserInfoId,
+		})
+	}
+	dao.Create(&userRoles)
+	return r.OK
+}
+
+func (*User) UpdateDisable(id, isDisable int) {
+	dao.UpdatesMap(&model.UserInfo{}, map[string]any{"is_disable": isDisable}, "id", id)
+}
+
+func (*User) UpdatePassword(req req.UpdatePassword) int {
+	// 判断用户是否存在
+	if exist := checkUserExistByName(req.Username); !exist {
+		return r.ERROR_USER_NOT_EXIST
+	}
+	// 执行存在时的更新服务
+	m := map[string]any{"password": utils.Encryptor.BcryptHash(req.Password)}
+	dao.UpdatesMap(&model.UserAuth{}, m, "username = ?", req.Password)
+	return r.OK
+}
+
+func checkUserExistByName(username string) bool {
+	existUser := dao.GetOne(model.UserAuth{}, "username = ?", username)
+	return existUser.ID != 0
+}
+
+func (*User) UpdateCurrentPassword(req req.UpdateAdminPassword, id int) int {
+	user := dao.GetOne(model.UserAuth{}, "id", id) // 获取用户信息
+	if !user.IsEmpty() && utils.Encryptor.BcryptCheck(req.NewPassword, req.OldPassword) {
+		user.Password = utils.Encryptor.BcryptHash(req.NewPassword)
+		dao.Update(&user, "password")
+		return r.OK
+	} else {
+		return r.ERROR_OLD_PASSWORD
+	}
+}
+
+func (*User) UpdateCurrent(req req.UpdateCurrentUser) (code int) {
+	user := utils.CopyProperties[model.UserInfo](req)
+	dao.Update(&user, "nickname", "intro", "website", "avatar", "email")
+	return r.OK
+}
+
+// GetOnlineList 查询当前在线用户，分页+条件搜索
+func (*User) GetOnlineList(req req.PageQuery) resp.PageResult[[]resp.UserOnline] {
+	onlineList := make([]resp.UserOnline, 0)
+
+	keys := utils.Redis.Keys(KEY_USER + "*")
+	for _, key := range keys {
+		var sessionInfo dto.SessionInfo
+		utils.Json.Unmarshal(utils.Redis.GetVal(key), &sessionInfo) // 这里进行解码并将数据保存
+
+		// 查询关键字不为空，且不符查询条件
+		if req.KeyWord != "" && !strings.Contains(sessionInfo.Nickname, req.KeyWord) {
+			continue
+		}
+
+		onlineUser := utils.CopyProperties[resp.UserOnline](sessionInfo)
+		onlineUser.UserIndoId = sessionInfo.UserInfoId // 一个个获取并保存
+		onlineList = append(onlineList, onlineUser)
+	}
+
+	// 根据上次登陆时间进行排序
+	sort.Slice(onlineList, func(i, j int) bool {
+		return onlineList[i].LastLoginTime.Unix() > onlineList[j].LastLoginTime.Unix()
+	})
+	return resp.PageResult[[]resp.UserOnline]{
+		Total: int64(len(keys)),
+		List:  onlineList,
+	}
+}
+
+func (*User) ForceOffline(req req.ForceOfflineUser) (code int) {
+	uuid := utils.Encryptor.MD5(req.IpAddress + req.Browser + req.OS)
+	var sessionInfo dto.SessionInfo
+	utils.Json.Unmarshal(utils.Redis.GetVal(KEY_USER+uuid), &sessionInfo)
+	sessionInfo.IsOffline = 1
+	utils.Redis.Del(KEY_USER + uuid)
+	// 设置强制离线之后 Redis 中存储的 delete:xxx 时间和 Token 过期时间一致
+	utils.Redis.Set(KEY_DELETE+uuid, utils.Json.Marshal(sessionInfo), time.Duration(config.Cfg.JWT.Expire)*time.Hour)
+	return r.OK
 }

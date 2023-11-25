@@ -31,7 +31,7 @@ func BackRouter() http.Handler {
 
 	// 基于 cookie 存储 session 这也用作一个中间件
 	// 诶嘿，但是现在不写，后面再写 写了几天发现要跑起来还是要写session
-	store := cookie.NewStore([]byte(config.Cfg.Session.Salt))
+	store := cookie.NewStore([]byte(config.Cfg.Session.Salt)) // 用于校验的authentication
 
 	// session 存储时间跟 JWT 过期时间一致
 	store.Options(sessions.Options{MaxAge: int(config.Cfg.JWT.Expire) * 3600})
@@ -48,6 +48,8 @@ func BackRouter() http.Handler {
 	// 需要登录鉴权的接口
 	auth := base.Group("") // "/admin"
 	// !注意中间件的顺序
+	// 洋葱结构的实现，类似的koa
+	// 中间件：鉴权、权限、监听在线、记录日志
 	auth.Use(middleware.JWTAuth())      // JWT 鉴权中间件
 	auth.Use(middleware.RBAC())         // casbin 权限中间件
 	auth.Use(middleware.ListenOnline()) // 监听在线用户
@@ -65,17 +67,25 @@ func BackRouter() http.Handler {
 			setting.PUT("/about", blogInfoAPI.UpdateAbout)            // 编辑关于我
 		}
 
-		// 用户模块
+		// 用户模块 用户的上线下线修改密码获取列表
 		user := auth.Group("/user")
 		{
-			user.GET("/list", userAPI.GetList)
-			user.GET("/info", userAPI.GetInfo)
+			user.GET("/list", userAPI.GetList)                           // 获取用户列表
+			user.GET("/info", userAPI.GetInfo)                           // 获取当前用户信息
+			user.PUT("", userAPI.Update)                                 // 更新用户信息
+			user.PUT("/disable", userAPI.UpdateDisable)                  // 修改用户禁用状态
+			user.PUT("/password", userAPI.UpdatePassword)                // 修改普通用户密码，不需要原密码
+			user.PUT("/current/password", userAPI.UpdateCurrentPassword) // 修改管理员用户密码，不需要原密码
+			user.PUT("/current", userAPI.UpdateCurrent)                  // 修改当前用户的密码
+			user.GET("/online", userAPI.GetOnlineList)                   // 获取在线用户信息
+			user.DELETE("/offline", userAPI.ForceOffline)                // 强制用户下线
 		}
 
 		// 分类模块
 		category := auth.Group("/category")
 		{
-			category.GET("/list", categoryAPI.GetList)
+			category.GET("/list", categoryAPI.GetList)  // 分类列表
+			category.POST("", categoryAPI.SaveOrUpdate) // 新增/编辑分类
 		}
 
 		// 标签模块

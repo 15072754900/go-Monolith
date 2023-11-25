@@ -58,6 +58,11 @@ func (*_redis) Del(key string) {
 	}
 }
 
+// Keys 获取根据匹配项获取键名列表
+func (*_redis) Keys(pattern string) []string {
+	return rdb.Keys(ctx, pattern).Val()
+}
+
 // SMembers 获取 [集合(Set)] 的成员列表
 func (*_redis) SMembers(key string) []string {
 	return rdb.SMembers(ctx, key).Val()

@@ -31,7 +31,17 @@ type LoginVO struct {
 	Token string `json:"token"`
 }
 
-// 在线用户
+// UserOnline 在线用户
+type UserOnline struct {
+	UserIndoId    int       `json:"user_info_id"`
+	Nickname      string    `json:"nickname"`
+	Avatar        string    `json:"avatar"`
+	IpAddress     string    `json:"ip_address"`
+	IpSource      string    `json:"ip_source"`
+	Browser       string    `json:"browser"`
+	OS            string    `json:"os"`
+	LastLoginTime time.Time `json:"last_login_time"`
+}
 
 // UserInfoVO 用户信息 VO
 type UserInfoVO struct {

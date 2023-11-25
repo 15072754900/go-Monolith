@@ -5,7 +5,7 @@ import "gin-blog-hufeng/model/resp"
 // SessionInfo Session 信息：记录用户详细信息 + 是否被强退
 type SessionInfo struct {
 	UserDetailDTO
-	Isoffline int `json:"is_offline"`
+	IsOffline int `json:"is_offline"`
 }
 
 // UserDetailDTO 用户详细信息：仅用于在后端内部进行传输
