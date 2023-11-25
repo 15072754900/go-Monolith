@@ -20,5 +20,5 @@ func (*Category) GetList(req req.PageQuery) resp.PageResult[[]resp.CategoryVo] {
 
 func (*Category) SaveOrUpdate(req req.AddOrEditCategory) int {
 	// 查询目标分类是否存在
-	existByName := dao.GetOne(model)
+	existByName := dao.GetOne(model.)
 }
