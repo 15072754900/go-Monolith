@@ -14,6 +14,7 @@ func (*Category) GetList(c *gin.Context) {
 	r.SuccessData(c, categoryService.GetList(utils.BindPageQuery(c)))
 }
 
+// SaveOrUpdate 简短的但是涉及比较多
 func (*Category) SaveOrUpdate(c *gin.Context) {
 	r.SendCode(c, categoryService.SaveOrUpdate(utils.BindValidJson[req.AddOrEditCategory](c)))
 }
