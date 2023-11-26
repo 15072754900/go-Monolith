@@ -81,17 +81,20 @@ func BackRouter() http.Handler {
 			user.DELETE("/offline", userAPI.ForceOffline)                // 强制用户下线
 		}
 
-		// 分类模块
+		// 分类模块: 列表，新增，编辑，删除，选项
 		category := auth.Group("/category")
 		{
-			category.GET("/list", categoryAPI.GetList)  // 分类列表
-			category.POST("", categoryAPI.SaveOrUpdate) // 新增/编辑分类
+			category.GET("/list", categoryAPI.GetList)     // 分类列表
+			category.POST("", categoryAPI.SaveOrUpdate)    // 新增/编辑分类
+			category.DELETE("", categoryAPI.Delete)        // 删除分类
+			category.GET("/option", categoryAPI.GetOption) // 分类选项列表
 		}
 
-		// 标签模块
+		// 标签模块 和前面工作基本一致
 		tag := auth.Group("/tag")
 		{
-			tag.GET("/list", tagAPI.GetList)
+			tag.GET("/list", tagAPI.GetList)  // 标签列表
+			tag.POST("", tagAPI.SavaOrUpdate) // 新增/编辑标签
 		}
 
 		// 文章模块

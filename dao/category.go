@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"gin-blog-hufeng/model"
 	"gin-blog-hufeng/model/req"
 	"gin-blog-hufeng/model/resp"
 )
@@ -25,4 +26,10 @@ func (*Category) GetList(req req.PageQuery) ([]resp.CategoryVo, int64) {
 		Limit(req.PageSize).Offset(req.PageSize * (req.PageNum - 1)).
 		Find(&dates)
 	return dates, total
+}
+
+func (*Category) GetOption() []resp.OptionVo {
+	var list = make([]resp.OptionVo, 0)
+	DB.Model(&model.Category{}).Select("id", "name").Find(&list)
+	return list
 }

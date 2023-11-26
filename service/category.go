@@ -37,3 +37,18 @@ func (*Category) SaveOrUpdate(req req.AddOrEditCategory) int {
 	}
 	return r.OK
 }
+
+func (*Category) Delete(ids []int) (code int) {
+	// 先查看分类名下是否存在文章，然后展示
+	count := dao.Count(model.Article{}, "category_id in ?", ids)
+	if count > 0 {
+		return r.ERROR_CATE_ART_EXIST
+	}
+	// 否则查询并删除，问：可以一行命令删除多个ID？
+	dao.Delete(model.Category{}, "id in ?", ids)
+	return r.OK
+}
+
+func (*Category) GetOption() []resp.OptionVo {
+	return categoryDao.GetOption()
+}
