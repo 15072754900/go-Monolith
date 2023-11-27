@@ -10,6 +10,7 @@ var (
 	categoryAPI v1.Category
 	tagAPI      v1.Tag
 	menuAPI     v1.Menu
+	articleAPI  v1.Article
 )
 
 // 前台接口

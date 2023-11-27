@@ -2,6 +2,7 @@ package req
 
 // KeywordQuery 关键字查询
 type KeywordQuery struct {
+	Keyword string `json:"keyword"`
 }
 
 // PageQuery 获取数据（需要分页）

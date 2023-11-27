@@ -37,3 +37,17 @@ func (*Tag) SaveOrUpdate(req req.AddOrEditTag) int {
 	}
 	return r.OK
 }
+
+func (*Tag) Delete(ids []int) (code int) {
+	// 检查是否存在文章在该标签下面，存在则必须先删除文章，所以先报错
+	count := dao.Count(model.Article{}, "tag_id = ?", ids)
+	if count > 0 {
+		return r.ERROR_TAG_ART_EXIST
+	}
+	dao.Delete(model.Article{}, "id in ?", ids)
+	return r.OK
+}
+
+func (*Tag) GetOption() []resp.OptionVo {
+	return tagDao.GetOption()
+}

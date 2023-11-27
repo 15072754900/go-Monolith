@@ -8,4 +8,5 @@ var (
 	categoryService service.Category
 	tagService      service.Tag
 	menuService     service.Menu
+	articleService  service.Article
 )

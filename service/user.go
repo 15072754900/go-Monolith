@@ -225,6 +225,7 @@ func (*User) GetOnlineList(req req.PageQuery) resp.PageResult[[]resp.UserOnline]
 	}
 }
 
+// ForceOffline 在线与离线服务计算存储是在Redis中设置的
 func (*User) ForceOffline(req req.ForceOfflineUser) (code int) {
 	uuid := utils.Encryptor.MD5(req.IpAddress + req.Browser + req.OS)
 	var sessionInfo dto.SessionInfo

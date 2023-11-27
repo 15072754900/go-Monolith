@@ -32,8 +32,8 @@ func (*User) Update(c *gin.Context) {
 
 // UpdateDisable 修改用户禁用状态
 func (*User) UpdateDisable(c *gin.Context) {
-	req := utils.BindValidJson[req.UpdateUserDisable](c) // 用户的信息在传输的上下文中提取出来，并进行修改或删除
-	userService.UpdateDisable(req.ID, *req.IsDisable)
+	req1 := utils.BindValidJson[req.UpdateUserDisable](c) // 用户的信息在传输的上下文中提取出来，并进行修改或删除
+	userService.UpdateDisable(req1.ID, *req1.IsDisable)
 	r.Success(c)
 }
 

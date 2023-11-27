@@ -93,12 +93,24 @@ func BackRouter() http.Handler {
 		// 标签模块 和前面工作基本一致
 		tag := auth.Group("/tag")
 		{
-			tag.GET("/list", tagAPI.GetList)  // 标签列表
-			tag.POST("", tagAPI.SavaOrUpdate) // 新增/编辑标签
+			tag.GET("/list", tagAPI.GetList)     // 标签列表
+			tag.POST("", tagAPI.SaveOrUpdate)    // 新增/编辑标签
+			tag.DELETE("", tagAPI.Delete)        // 删除标签
+			tag.GET("/option", tagAPI.GetOption) // 标签选项列表
 		}
 
 		// 文章模块
-
+		articles := auth.Group("/article")
+		{
+			articles.GET("/list", articleAPI.GetList)           // 文章列表
+			articles.POST("", articleAPI.SaveOrUpdate)          // 新增/编辑文章
+			articles.PUT("/top", articleAPI.UpdateTop)          // 更新文章置顶
+			articles.GET("/:id", articleAPI.GetInfo)            // 文章详情
+			articles.PUT("/soft-delete", articleAPI.SoftDelete) // 软删除文章
+			articles.DELETE("", articleAPI.Delete)              // 物理删除文章
+			articles.POST("/export", articleAPI.Export)         // 导出文章
+			articles.POST("/import", articleAPI.Import)         // 导入文章
+		}
 		// 评论模块
 
 		// 留言模块

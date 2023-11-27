@@ -1,6 +1,8 @@
 package model
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type Tag struct {
 	Universal
