@@ -124,3 +124,12 @@ func (*_redis) GetInt(key string) int {
 	val, _ := rdb.Get(ctx, key).Int() // 文档开始有检查，后面不检查了
 	return val
 }
+
+// HGetAll 获取哈希值表的所有内容
+func (*_redis) HGetAll(key string) map[string]string {
+	return rdb.HGetAll(ctx, key).Val()
+}
+
+func (*_redis) ZRangeWithScores(key string, start, stop int64) []redis.Z {
+	return rdb.ZRangeWithScores(ctx, key, start, stop).Val()
+}

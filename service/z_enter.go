@@ -31,4 +31,5 @@ var (
 	categoryDao dao.Category
 	tagDao      dao.Tag
 	menuDao     dao.Menu
+	articleDao  dao.Article
 )
