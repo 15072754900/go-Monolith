@@ -16,12 +16,17 @@ func (*Article) GetList(c *gin.Context) {
 	r.SuccessData(c, articleService.GetList(utils.BindQuery[req.GetArts](c)))
 }
 
+// SaveOrUpdate 保存文章需要知道作者信息，这里采用从用户token值获取信息
 func (*Article) SaveOrUpdate(c *gin.Context) {
-
+	r.SendCode(c, articleService.SaveOrUpdate(
+		utils.BindValidJson[req.SaveOrUpdateArt](c),
+		utils.GetFromContent[int](c, "user_info_id"),
+	))
 }
 
+// UpdateTop 修改置顶信息
 func (*Article) UpdateTop(c *gin.Context) {
-
+	r.SendCode(c, articleService.UpdateTop(utils.BindValidJson[req.UpdateArtTop](c))) // 信息还是要验证是否准确
 }
 
 func (*Article) GetInfo(c *gin.Context) {

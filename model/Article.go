@@ -1,5 +1,7 @@
 package model
 
+import "reflect"
+
 const (
 	PUBLIC = 1 + iota // 公开
 	SECRET            // 私密
@@ -25,4 +27,13 @@ type Article struct {
 	IsTop       *int8  `gorm:"type:tinyint;not null;default:0;comment:是否置顶(0-否 1-是)" json:"is_top"`
 	IsDelete    *int8  `gorm:"type:tinyint;not null;default:0;comment:是否放到回收站(0-否 1-是)" json:"is_delete"` // 这个在后面学习数据库的时候还要好好思考
 	OriginalUrl string `gorm:"type:varchar(100);comment:源链接" json:"original_url"`
+}
+
+type ArticleTag struct {
+	ArticleId int
+	TagId     int
+}
+
+func (a *Article) IsEmpty() bool {
+	return reflect.DeepEqual(a, &Article{})
 }

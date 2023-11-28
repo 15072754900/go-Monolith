@@ -66,7 +66,7 @@ func (*BlogInfo) GetBlogConfig() (respVO model.BlogConfigDetail) {
 		blogConfig = dao.GetOne(model.BlogConfig{}, "id", 1).Config
 		utils.Redis.Set(KEY_BLOG_CONFIG, blogConfig, 0)
 	}
-	// 反序列化字符串为 golang 对象
+	// 反序列化字符串为 golang 需要的文件名 对象
 	utils.Json.Unmarshal(blogConfig, &respVO)
 	return respVO
 }

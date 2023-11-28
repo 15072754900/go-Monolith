@@ -33,3 +33,7 @@ var (
 	menuDao     dao.Menu
 	articleDao  dao.Article
 )
+
+var (
+	blogInfoService BlogInfo
+)
