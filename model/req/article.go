@@ -34,3 +34,8 @@ type UpdateArtTop struct {
 	ID    int   `json:"id"`
 	IsTop *int8 `json:"is_top" validate:"required,min=0,max=1" label:"是否置顶（0-否，1-是）"`
 }
+
+type SoftDelete struct {
+	Ids      []int `json:"ids"`
+	IsDelete *int8 `json:"is_delete" validate:"required,min=0,min=1"` // 软删除到回收站，没有的字段不使用
+}

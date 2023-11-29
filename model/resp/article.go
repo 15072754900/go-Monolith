@@ -32,3 +32,17 @@ type ArticleVo struct {
 	LikeCount int `json:"like_count"`
 	ViewCount int `json:"view_count"`
 }
+
+type ArticleDetailVO struct {
+	ID           int      `json:"id"`
+	Title        string   `json:"title"`
+	Desc         string   `json:"desc"`
+	Content      string   `json:"content"`
+	Img          string   `json:"img"`
+	CategoryName *string  `json:"category_name"`
+	TagNames     []string `json:"tag_names"`
+	Type         int      `json:"type"`
+	OriginalUrl  string   `json:"original_url"`
+	IsTop        int      `json:"is_top"`
+	Status       int      `json:"status"`
+}

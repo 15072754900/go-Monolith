@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
+	"strconv"
 )
 
 // Validate 参数合法性校验
@@ -88,4 +89,14 @@ func GetFromContent[T any](c *gin.Context, key string) T {
 		panic(r.ERROR_TOKEN_RUNTIME)
 	}
 	return val.(T)
+}
+
+func GetIntParam(c *gin.Context, key string) int {
+	val, err := strconv.Atoi(c.Param(key))
+	if err != nil {
+		Logger.Error("GetIntParam", zap.Error(err))
+		panic(r.ERROR_REQUEST_PARAM)
+	}
+	return val
+
 }

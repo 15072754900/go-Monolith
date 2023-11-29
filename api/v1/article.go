@@ -29,20 +29,23 @@ func (*Article) UpdateTop(c *gin.Context) {
 	r.SendCode(c, articleService.UpdateTop(utils.BindValidJson[req.UpdateArtTop](c))) // 信息还是要验证是否准确
 }
 
+// GetInfo 获取文章详细信息
 func (*Article) GetInfo(c *gin.Context) {
-
+	r.SuccessData(c, articleService.GetInfo(utils.GetIntParam(c, "id")))
 }
 
+// SoftDelete 这个与delete的区别在于用put方法，以及...
 func (*Article) SoftDelete(c *gin.Context) {
-
+	req := utils.BindValidJson[req.SoftDelete](c)
+	r.SendCode(c, articleService.SoftDelete(req.Ids, req.IsDelete))
 }
 
 func (*Article) Delete(c *gin.Context) {
-
+	r.SendCode(c, articleService.Delete(utils.BindJson[[]int](c)))
 }
 
 func (*Article) Export(c *gin.Context) {
-
+	r.SuccessData(c, articleService.export)
 }
 
 func (*Article) Import(c *gin.Context) {

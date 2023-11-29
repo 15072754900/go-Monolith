@@ -1,6 +1,7 @@
 package service
 
 import (
+	"gin-blog-hufeng/config"
 	"gin-blog-hufeng/dao"
 	"gin-blog-hufeng/model"
 	"gin-blog-hufeng/model/req"
@@ -117,4 +118,43 @@ func (*Article) UpdateTop(req req.UpdateArtTop) (code int) {
 	}
 	dao.Update(&article)
 	return r.OK
+}
+
+func (*Article) GetInfo(id int) resp.ArticleDetailVO {
+	article := dao.GetOne(model.Article{}, "id", id)
+	category := dao.GetOne(model.Category{}, "id", id)
+	tagNames := tagDao.GetTagNamesByArtId(id)
+
+	articleVo := utils.CopyProperties[resp.ArticleDetailVO](article)
+	// 前端 category 为 '' 不显示 placeholder，为 null 显示 placeholder (?)
+	if category.ID != 0 {
+		articleVo.CategoryName = &category.Name
+	}
+	articleVo.TagNames = tagNames
+	return articleVo
+}
+
+func (*Article) SoftDelete(ids []int, isDelete *int8) (code int) {
+	var isTop int8 = 0
+	dao.Updates(&model.Article{IsTop: &isTop, IsDelete: isDelete}, "id IN ?", ids)
+	return r.OK
+}
+
+func (*Article) Delete(ids []int) (code int) {
+	// 删除 文章-标签 关联
+	dao.Delete(model.ArticleTag{}, "article_id IN ?", ids)
+	// 删除 [文章]
+	dao.Delete(model.Article{}, "id IN ?", ids)
+	return r.OK
+}
+
+// Export 注意：这里导出的不是一个，而是一些文章的标题文本信息，使用一个string切片导出，在前端进行解读
+func (*Article) Export(ids []int) []string {
+	urls := make([]string, 0)
+	articles := dao.List([]model.Article{}, "title, content", "", "id in ?", ids)
+	for _, article := range articles {
+		utils.File.WriteFile(article.Title+".md", config.Cfg.Upload.MdStorePath, article.Content)
+		urls = append(urls, config.Cfg.Upload.MdPath+article.Title+".md")
+	}
+	return urls
 }

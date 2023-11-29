@@ -30,3 +30,11 @@ func (*Tag) GetOption() []resp.OptionVo {
 	DB.Model(&model.Tag{}).Select("id", "name").Find(&list)
 	return list
 }
+
+func (*Tag) GetTagNamesByArtId(id int) []string {
+	list := make([]string, 0)
+
+	DB.Table("tag").Joins("LEFT JOIN article_tag ON tag.id = article_tag.tag_id").Where("article_id", id).Pluck("name", &list)
+
+	return list
+}
