@@ -45,9 +45,21 @@ func (*Article) Delete(c *gin.Context) {
 }
 
 func (*Article) Export(c *gin.Context) {
-	r.SuccessData(c, articleService.export)
+	r.SuccessData(c, articleService.Export(utils.BindJson[[]int](c)))
 }
 
+// Import 导入文章： 题目+内容
 func (*Article) Import(c *gin.Context) {
-
+	_, fileHeader, err := c.Request.FormFile("file")
+	if err != nil {
+		r.SendCode(c, r.ERROR_FILE_UPLOAD)
+		return
+	}
+	fileName := fileHeader.Filename
+	articleService.Import(
+		fileName[:len(fileName)-3],
+		utils.File.ReadFromFileHeader(fileHeader),
+		utils.GetFromContent[int](c, "user_info_id"),
+	)
+	r.Success(c)
 }

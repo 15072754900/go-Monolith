@@ -158,3 +158,15 @@ func (*Article) Export(ids []int) []string {
 	}
 	return urls
 }
+
+func (*Article) Import(title, content string, userId int) {
+	article := model.Article{
+		Title:   title,
+		Content: content,
+		Status:  model.DRAFT,
+		Type:    1,                                            // 默认为原创
+		Img:     blogInfoService.GetBlogConfig().ArticleCover, // 默认图片
+		UserId:  userId,
+	}
+	dao.Create(&article)
+}
