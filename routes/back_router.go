@@ -112,11 +112,26 @@ func BackRouter() http.Handler {
 			articles.POST("/import", articleAPI.Import)         // 导入文章
 		}
 		// 评论模块
-
+		comment := auth.Group("comment")
+		{
+			comment.GET("/list", commentAPI.GetList)
+			comment.PUT("review", commentAPI.UpdateReview)
+			comment.DELETE("", commentAPI.Delete)
+		}
 		// 留言模块
-
+		message := auth.Group("/message")
+		{
+			message.GET("/list", messageAPI.GetList)
+			message.DELETE("", messageAPI.Delete)
+			message.PUT("review", messageAPI.UpdateReview)
+		}
 		// 友情链接
-
+		link := auth.Group("/link")
+		{
+			link.GET("/list", linkAPI.GetList)
+			link.POST("", linkAPI.SaveOrUpdate)
+			link.DELETE("", linkAPI.Delete)
+		}
 		// 资源模块
 
 		// 菜单模块

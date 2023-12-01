@@ -23,6 +23,7 @@ func (v *ValidateUtil) Validate(data any) string {
 	// 翻译器
 	trans := v.validateTransInit(validate)
 
+	// 在这里进行对data传入字段进行预定义规则的验证，如"validate:"required""的字段以及之后的附加要求，这些在这里起作用并出结果
 	err := validate.Struct(data)
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {

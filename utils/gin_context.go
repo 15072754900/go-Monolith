@@ -100,3 +100,14 @@ func GetIntParam(c *gin.Context, key string) int {
 	return val
 
 }
+
+func BindValidQuery[T any](c *gin.Context) (data T) {
+	// Query绑定
+	if err := c.ShouldBindQuery(&data); err != nil {
+		Logger.Error("BindValidQuery", zap.Error(err))
+		panic(r.ERROR_REQUEST_PARAM)
+	}
+	// 参数合法性
+	Validate(c, &data)
+	return data
+}

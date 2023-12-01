@@ -32,6 +32,8 @@ var (
 	tagDao      dao.Tag
 	menuDao     dao.Menu
 	articleDao  dao.Article
+	commentDao  dao.Comment
+	messageDao  dao.Message
 )
 
 var (

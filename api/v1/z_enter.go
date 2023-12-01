@@ -9,4 +9,6 @@ var (
 	tagService      service.Tag
 	menuService     service.Menu
 	articleService  service.Article
+	commentService  service.Comment
+	messageService  service.Message
 )

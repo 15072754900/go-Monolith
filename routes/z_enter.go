@@ -11,6 +11,8 @@ var (
 	tagAPI      v1.Tag
 	menuAPI     v1.Menu
 	articleAPI  v1.Article
+	commentAPI  v1.Comment
+	messageAPI  v1.Message
 )
 
 // 前台接口

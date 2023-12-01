@@ -11,3 +11,9 @@ type PageQuery struct {
 	PageNum  int    `form:"page_num"`
 	KeyWord  string `form:"keyword"`
 }
+
+// UpdateReview 修改审核 （批量）
+type UpdateReview struct {
+	Ids      []int `json:"ids"`
+	IsReview *int8 `json:"is_review" validate:"required,min=0,max=1"`
+}
