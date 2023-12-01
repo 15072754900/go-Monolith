@@ -13,6 +13,7 @@ var (
 	articleAPI  v1.Article
 	commentAPI  v1.Comment
 	messageAPI  v1.Message
+	linkAPI     v1.Link
 )
 
 // 前台接口
