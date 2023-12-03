@@ -11,5 +11,6 @@ var (
 	articleService  service.Article
 	commentService  service.Comment
 	messageService  service.Message
-	linkService     service.Link
+	linkService     service.FriendLink
+	resourceService service.Resource
 )

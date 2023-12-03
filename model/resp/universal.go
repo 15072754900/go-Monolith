@@ -12,3 +12,9 @@ type OptionVo struct {
 	ID   int    `json:"value"`
 	Name string `json:"label"`
 }
+
+type TreeOptionVo struct {
+	ID       int    `json:"key"`
+	Label    string `json:"label"`
+	Children []TreeOptionVo
+}

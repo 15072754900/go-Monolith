@@ -14,6 +14,7 @@ var (
 	commentAPI  v1.Comment
 	messageAPI  v1.Message
 	linkAPI     v1.Link
+	resourceAPI v1.Resource
 )
 
 // 前台接口

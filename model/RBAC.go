@@ -50,3 +50,19 @@ type UserAuth struct {
 func (u *UserAuth) IsEmpty() bool {
 	return reflect.DeepEqual(u, &UserAuth{})
 }
+
+// Resource 资源接口
+// Resource == casbin_rule
+type Resource struct {
+	Universal     `mapstructure:",squash"`
+	Url           string `gorm:"type:varchar(255);comment:资源路径(接口URL)" json:"url" mapstructure:"url"`
+	RequestMethod string `gorm:"type:varchar(10);comment:请求方式" json:"request_method" mapstructure:"request_method"`
+	Name          string `gorm:"type:varchar(50);comment:资源名(接口名)" json:"name" mapstructure:"name"`
+	ParentId      int    `gorm:"comment:父权限id" json:"parent_id" mapstructure:"parent_id,omitempty"`
+	IsAnonymous   int    `gorm:"type:tinyint(1);comment:是否匿名访问(0-否 1-是)" json:"is_anonymous" mapstructure:"is_anonymous"`
+}
+
+type RoleResource struct {
+	RoleId     int `json:"role_id"`
+	ResourceId int `json:"resource_id"`
+}

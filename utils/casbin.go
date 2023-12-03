@@ -4,6 +4,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"log"
 	"sync"
@@ -70,4 +71,25 @@ func (*_casbin) Enforcer() *casbin.CachedEnforcer {
 func (*_casbin) LoadPolicy() {
 	// log.Println("重加载策略，使得更新的策略生效...")
 	cachedEnforcer.LoadPolicy()
+}
+
+// UpdatePolicy 更新 API 权限
+func (c *_casbin) UpdatePolicy(old []string, new []string) {
+	_, err := cachedEnforcer.UpdatePolicy(old, new)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"UpdatePolicy: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
+
+}
+
+// DeletePermission 删除并更新 API 权限
+func (c *_casbin) DeletePermission(permission ...string) {
+	_, err := cachedEnforcer.DeletePermission(permission...)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"DeletePermission: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
 }

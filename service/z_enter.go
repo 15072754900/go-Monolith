@@ -26,14 +26,16 @@ const (
 )
 
 var (
-	roleDao     dao.Role
-	userDao     dao.User
-	categoryDao dao.Category
-	tagDao      dao.Tag
-	menuDao     dao.Menu
-	articleDao  dao.Article
-	commentDao  dao.Comment
-	messageDao  dao.Message
+	roleDao       dao.Role
+	userDao       dao.User
+	categoryDao   dao.Category
+	tagDao        dao.Tag
+	menuDao       dao.Menu
+	articleDao    dao.Article
+	commentDao    dao.Comment
+	messageDao    dao.Message
+	friendLinkDao dao.FriendLink
+	resourceDao   dao.Resource
 )
 
 var (
