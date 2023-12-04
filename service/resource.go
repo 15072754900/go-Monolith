@@ -117,9 +117,43 @@ func (*Resource) Delete(id int) (code int) {
 }
 
 func (*Resource) UpdateAnonymous(req req.UpdateAnonymous) (code int) {
-
+	// 检查要更新的资源是否存在
+	existById := dao.GetOne(model.Resource{}, "id", req.ID)
+	if existById.ID == 0 {
+		return r.ERROR_RESOURCE_NOT_EXIST
+	}
+	// 只更新 is_anonymous 字段
+	dao.UpdatesMap(&model.Resource{}, map[string]any{"is_anonymous": *req.IsAnonymous}, "id", req.ID)
+	// 关联 casbin_rule 中的 isAnonymous
+	if *req.IsAnonymous == 0 {
+		// 进行删除权限操作
+		utils.Casbin.DeletePermissionForRole("anonymous", req.Url, req.RequestMethod)
+	} else {
+		utils.Casbin.AddPermissionForRole("anonymous", req.Url, req.RequestMethod)
+	}
+	return r.OK
 }
 
+// GetOptionList 获取树形数据选项，采取的还是遍历父节点的元素，并加入子节点在父节点中的id对应的元素
 func (*Resource) GetOptionList() []resp.TreeOptionVo {
-
+	resList := make([]resp.TreeOptionVo, 0)
+	resources := dao.List([]model.Resource{}, "id , name, parent_id", "", "is_anonymous = ?", 0)
+	parentList := getModuleList(resources)
+	childrenMap := getChildrenMap(resources)
+	for _, item := range parentList {
+		// 构造 Children
+		var childrenOptionVos []resp.TreeOptionVo
+		for _, re := range childrenMap[item.ID] {
+			childrenOptionVos = append(childrenOptionVos, resp.TreeOptionVo{
+				ID:    re.ID,
+				Label: re.Name,
+			})
+		}
+		resList = append(resList, resp.TreeOptionVo{
+			ID:       item.ID,
+			Label:    item.Name,
+			Children: childrenOptionVos,
+		})
+	}
+	return resList
 }

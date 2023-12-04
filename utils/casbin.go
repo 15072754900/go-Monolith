@@ -93,3 +93,21 @@ func (c *_casbin) DeletePermission(permission ...string) {
 	}
 	c.LoadPolicy()
 }
+
+func (c *_casbin) DeletePermissionForRole(roleLabel string, permissions ...string) {
+	_, err := cachedEnforcer.DeletePermissionForUser(roleLabel, permissions...)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"DeletePermissionForRole: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
+}
+
+func (c *_casbin) AddPermissionForRole(roleLabel string, permissions ...string) {
+	_, err := cachedEnforcer.AddPermissionForUser(roleLabel, permissions...)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"AddPermissionForRole: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
+}
