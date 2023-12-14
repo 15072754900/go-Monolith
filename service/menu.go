@@ -1,9 +1,12 @@
 package service
 
 import (
+	"gin-blog-hufeng/dao"
 	"gin-blog-hufeng/model"
 	"gin-blog-hufeng/model/req"
 	"gin-blog-hufeng/model/resp"
+	"gin-blog-hufeng/utils"
+	"gin-blog-hufeng/utils/r"
 	"sort"
 )
 
@@ -207,4 +210,72 @@ func (*Menu) menu2UserMenuVo(menu model.Menu) resp.UserMenuVo {
 		ParentId:  menu.ParentId,
 		Redirect:  menu.Redirect,
 	}
+}
+
+func (*Menu) SaveOrUpdate(req req.SaveOrUpdateMenu) (code int) {
+	// 执行增加或者更新的工作：
+	// 1.获取相对应名字的数据库信息，2.判断信息是否存在，3.存在则更新，不存在则新建
+	existByName := dao.GetOne(model.Menu{}, "name", req.Name)
+	if existByName.ID != 0 && existByName.ID != req.ID {
+		return r.ERROR_MENU_NAME_EXIST
+	}
+	if req.ID != 0 {
+		dao.UpdatesMap(&model.Menu{}, utils.Struct2Map(req), "id", req.ID)
+	} else {
+		data := utils.CopyProperties[model.Menu](req)
+		dao.Create(&data)
+	}
+	return r.OK
+}
+
+func (*Menu) Delete(menuId int) (code int) {
+	existById := dao.GetOne(model.Menu{}, "id", menuId)
+	if existById.ID != 0 {
+		return r.ERROR_MENU_NAME_EXIST
+	}
+	// 检查是否是父节点
+	existRoleMenu := dao.GetOne(model.RoleMenu{}, "menu_id", menuId)
+	if existRoleMenu.MenuId != 0 {
+		return r.ERROR_MENU_USED_BY_ROLE
+	}
+	// 如果是一级菜单，检查其是否有子菜单
+	if existById.ParentId != 0 {
+		if dao.Count(model.Menu{}, "parent_id", menuId) != 0 {
+			return r.ERROR_MENU_HAS_CHILDREN
+		}
+		// 删除菜单
+		dao.Delete(model.Menu{}, "id", menuId)
+	}
+	return r.OK
+}
+
+// GetOption 获取菜单选项列表（树形菜单）
+func (s *Menu) GetOption() []resp.TreeOptionVo {
+	var resList = make([]resp.TreeOptionVo, 0)
+
+	// 创建一个空表，然后向里面加
+	menus := dao.List([]model.Menu{}, "id, name, parent_id, order_num", "", "")
+	firstLevelMenus := s.getFirstLevelMenus(menus)
+	childrenMap := s.getMenuChildrenMap(menus)
+
+	for _, item := range firstLevelMenus {
+		// 步骤和添加和之前一样
+		var childrenOptionVos []resp.TreeOptionVo
+		children := childrenMap[item.ID]
+		if len(children) > 0 {
+			s.sortMenu(children)
+			for _, menu := range children {
+				childrenOptionVos = append(childrenOptionVos, resp.TreeOptionVo{
+					ID:    menu.ID,
+					Label: menu.Name,
+				})
+			}
+		}
+		resList = append(resList, resp.TreeOptionVo{
+			ID:       item.ID,
+			Label:    item.Name,
+			Children: childrenOptionVos,
+		})
+	}
+	return resList
 }

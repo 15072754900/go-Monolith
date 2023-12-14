@@ -111,3 +111,43 @@ func (c *_casbin) AddPermissionForRole(roleLabel string, permissions ...string) 
 	}
 	c.LoadPolicy()
 }
+
+func (c *_casbin) BatchDeletePermissions(roleLabels []string) {
+	for _, roleLabel := range roleLabels {
+		_, err := cachedEnforcer.DeletePermissionsForUser(roleLabel) // 删除该角色对应的权限API
+		if err != nil {
+			Logger.Error(CASBIN_UTIL_ERR_PREFIX+"BatchDeletePermissions: ", zap.Error(err))
+			panic(err)
+		}
+	}
+	c.LoadPolicy()
+}
+
+func (c *_casbin) AddRoleForUser(user, role string) {
+	_, err := cachedEnforcer.AddRoleForUser(user, role)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"AddRoleForUser: ", zap.Error(err))
+		panic(err)
+	}
+}
+
+func (c *_casbin) UpdateRoleLabels(oldLabel, newLabel string) {
+	err := casbin_db.Model(&gormadapter.CasbinRule{}).Where("v0 = ?", oldLabel).Update("v0", newLabel).Error
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"UpdateRoleLabels: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
+}
+
+func (c *_casbin) AddPolicies(rules [][]string) {
+	if len(rules) == 0 {
+		return
+	}
+	_, err := cachedEnforcer.AddPolicies(rules)
+	if err != nil {
+		Logger.Error(CASBIN_UTIL_ERR_PREFIX+"AddPolicies: ", zap.Error(err))
+		panic(err)
+	}
+	c.LoadPolicy()
+}

@@ -66,3 +66,15 @@ type RoleResource struct {
 	RoleId     int `json:"role_id"`
 	ResourceId int `json:"resource_id"`
 }
+
+type RoleMenu struct {
+	RoleId int `json:"role_id"`
+	MenuId int `json:"menu_id"`
+}
+
+type Role struct {
+	Universal
+	Name      string `gorm:"type:varchar(20);comment:角色名" json:"name"`
+	Label     string `gorm:"type:varchar(50);comment:角色描述" json:"label"`
+	IsDisable int    `gorm:"type:tinyint(1);comment:是否禁用(0-否 1-是)" json:"is_disable"`
+}

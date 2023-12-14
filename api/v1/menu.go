@@ -19,3 +19,15 @@ func (*Menu) GetUserMenu(c *gin.Context) {
 func (*Menu) GetTreeList(c *gin.Context) {
 	r.SuccessData(c, menuService.GetTreeList(utils.BindQuery[req.PageQuery](c)))
 }
+
+func (*Menu) Delete(c *gin.Context) {
+	r.SendCode(c, menuService.Delete(utils.GetIntParam(c, "id")))
+}
+
+func (*Menu) SaveOrUpdate(c *gin.Context) {
+	r.SendCode(c, menuService.SaveOrUpdate(utils.BindValidJson[req.SaveOrUpdateMenu](c)))
+}
+
+func (*Menu) GetOption(c *gin.Context) {
+	r.SuccessData(c, menuService.GetOption())
+}

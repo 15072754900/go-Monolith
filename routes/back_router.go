@@ -146,13 +146,33 @@ func BackRouter() http.Handler {
 		{
 			menu.GET("/list", menuAPI.GetTreeList)
 			menu.GET("/user/list", menuAPI.GetUserMenu) // 获取当前用户
+			menu.POST("", menuAPI.SaveOrUpdate)         // 新增/编辑菜单
+			menu.DELETE("/:id", menuAPI.Delete)         // 删除菜单
+			menu.GET("/option", menuAPI.GetOption)      // 菜单选项列表
 		}
 
 		// 角色模块
-
+		role := auth.Group("/role")
+		{
+			role.GET("/list", roleAPI.GetTreeList) // 角色列表（树形）
+			role.POST("", roleAPI.SaveOrUpdate)    // 新增/删除菜单
+			role.DELETE("", roleAPI.Delete)        // 删除角色
+			role.GET("/option", roleAPI.GetOption) // 角色选项列表
+		}
 		// 操作日志模块
+		operationLog := auth.Group("/operation/log")
+		{
+			operationLog.GET("/list", operationLogAPI.GetList)
+			operationLog.DELETE("", operationLogAPI.Delete)
+		}
 
 		// 页面模块
+		page := auth.Group("/page")
+		{
+			page.GET("list", pageAPI.GetList)
+			page.POST("", pageAPI.SaveOrUpdate)
+			page.DELETE("", pageAPI.Delete)
+		}
 	}
 
 	return r
